@@ -20,7 +20,7 @@ app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Replace with your RapidAPI key
-const RAPID_API_KEY = '7b85df9915mshe555f2f1d039642p199328jsn29c052a20f91';
+const RAPID_API_KEY = 'YOUR_API_KEY';
 
 // HTML template function for job cards
 const createJobCard = (job) => `
