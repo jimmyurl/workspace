@@ -1,4 +1,4 @@
-```markdown
+
 # Job Search App (Express & Node.js)
 
 This project is a job search application built using Express.js and Node.js. The app fetches job listings and detailed job information from a third-party API and presents it in a user-friendly format through a simple web interface.
