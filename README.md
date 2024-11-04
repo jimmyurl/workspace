@@ -1,4 +1,6 @@
+Here's the updated `README.md` incorporating the new project structure and additional details:
 
+```markdown
 # Job Search App (Express & Node.js)
 
 This project is a job search application built using Express.js and Node.js. The app fetches job listings and detailed job information from a third-party API and presents it in a user-friendly format through a simple web interface.
@@ -58,7 +60,32 @@ Ensure you have Node.js and npm installed on your system.
 ## Project Structure
 
 ```
-job-search-app/ │ ├── README.md ├── api/ # Backend logic and server code │ ├── config.js # Configuration file for API keys and settings │ ├── index.js # Main Express server file │ ├── index.html # Landing page served by the server │ ├── node_modules/ # Dependencies for the backend │ ├── package.json # Node.js project metadata for the backend │ └── package-lock.json │ ├── frontend/ # Frontend application files │ ├── dist/ # Compiled frontend files │ ├── src/ # Source code for the frontend │ ├── index.html # Entry point for the frontend app │ ├── node_modules/ # Dependencies for the frontend │ ├── package.json # Node.js project metadata for the frontend │ └── package-lock.json │ └── 
+job-search-app/
+│
+├── api/                    # Backend logic and server code
+│   ├── config.js           # Configuration file for API keys and settings
+│   ├── index.js            # Main Express server file
+│   ├── index.html          # Landing page served by the server
+│   ├── node_modules/       # Dependencies for the backend
+│   ├── package.json        # Node.js project metadata for the backend
+│   └── package-lock.json
+│
+├── frontend/               # Frontend application files
+│   ├── dist/               # Compiled frontend files
+│   ├── src/                # Source code for the frontend
+│   ├── index.html          # Entry point for the frontend app
+│   ├── node_modules/       # Dependencies for the frontend
+│   ├── package.json        # Node.js project metadata for the frontend
+│   └── package-lock.json
+│
+├── public/                 # Static files (HTML, CSS, JS)
+│   ├── index.html          # Main HTML file
+│   └── styles.css          # Optional CSS for styling
+│
+├── index.js                # Main server file
+├── README.md               # Project documentation
+└── node_modules/           # Top-level dependencies
+```
 
 ## API Integration
 
@@ -96,3 +123,5 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 
 This project is open-source and available under the [MIT License](LICENSE).
 ```
+
+Feel free to modify any sections further to suit your project's specifics!
