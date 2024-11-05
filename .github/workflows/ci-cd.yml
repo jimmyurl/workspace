@@ -1,0 +1,105 @@
+name: Node.js CI/CD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY_API: job-search-api
+  ECR_REPOSITORY_FRONTEND: job-search-frontend
+  ECS_CLUSTER: job-search-cluster
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    # API Tests
+    - name: Install API dependencies
+      working-directory: ./api
+      run: npm ci
+    
+    - name: Run API tests
+      working-directory: ./api
+      run: npm test
+    
+    # Frontend Tests
+    - name: Install Frontend dependencies
+      working-directory: ./frontend
+      run: npm ci
+    
+    - name: Run Frontend tests
+      working-directory: ./frontend
+      run: npm test
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    # AWS Authentication
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+    
+    # Build and Deploy API
+    - name: Build and push API image
+      working-directory: ./api
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_API:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY_API:latest .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_API:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_API:latest
+        echo "::set-output name=api_image::$ECR_REGISTRY/$ECR_REPOSITORY_API:$IMAGE_TAG"
+    
+    # Build and Deploy Frontend
+    - name: Build and push Frontend image
+      working-directory: ./frontend
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
+        echo "::set-output name=frontend_image::$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG"
+    
+    # Deploy to ECS
+    - name: Deploy to Amazon ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: .aws/task-definition-api.json
+        service: job-search-api-service
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+    - name: Deploy Frontend to Amazon ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: .aws/task-definition-frontend.json
+        service: job-search-frontend-service
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
