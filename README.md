@@ -30,7 +30,7 @@ Ensure you have Node.js and npm installed on your system.
 1. Clone the repository:
     ```bash
     git clone https://github.com/jimmyurl/workspace.git
-    cd job-search-app
+    cd workspace
     ```
 
 2. Install dependencies:
